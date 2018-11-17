@@ -13,7 +13,8 @@
   ],
   "minimum-stability": "stable",
   "require": {
-    "yozh/yii2-base": "@dev"
+    "yozh/yii2-base": "@dev",
+    "yozh/yii2-form": "@dev"
   },
   "extra": {
     "_bootstrap": "yozh\\property\\Bootstrap"
