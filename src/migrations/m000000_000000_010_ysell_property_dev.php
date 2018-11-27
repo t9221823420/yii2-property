@@ -15,28 +15,24 @@ use yozh\property\models\Property;
 
 class m000000_000000_010_ysell_property_dev extends Migration
 {
+	static $_table;
 	
 	public function __construct( array $config = [] )
 	{
-		
 		static::$_table = static::$_table ?? Property::getRawTableName();
 		
 		parent::__construct( $config );
 	}
 	
-	
 	public function safeUp( $params = [] )
 	{
-		
 		parent::safeUp( [
 			'mode' => 1 ? static::ALTER_MODE_UPDATE : static::ALTER_MODE_IGNORE,
 		] );
-		
 	}
 	
 	public function getColumns( $columns = [] )
 	{
-		
 		return parent::getColumns( ArrayHelper::merge( [
 			
 			'name'       => $this->string()->notNull(),

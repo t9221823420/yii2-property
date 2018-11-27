@@ -16,7 +16,7 @@ class _m000000_000000_000_ysell_property_children_example_dev extends \yozh\prop
 	
 	public function __construct( array $config = [] )
 	{
-		static::$_table = static::$_table ?? \yozh\ysell\models\product\ProductTemplateField::getRawTableName();
+		static::$_table = \yozh\ysell\models\product\ProductTemplateField::getRawTableName();
 		
 		parent::__construct( $config );
 	}
