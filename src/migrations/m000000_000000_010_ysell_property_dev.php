@@ -15,7 +15,7 @@ use yozh\property\models\Property;
 
 class m000000_000000_010_ysell_property_dev extends Migration
 {
-	static $_table;
+	protected static $_table;
 	
 	public function __construct( array $config = [] )
 	{
