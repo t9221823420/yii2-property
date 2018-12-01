@@ -13,7 +13,7 @@ use yozh\base\components\helpers\ArrayHelper;
 use yozh\form\ActiveField;
 use yozh\property\models\Property;
 
-class m000000_000000_010_ysell_property_dev extends Migration
+class m000000_000000_yozh_property_dev extends Migration
 {
 	protected static $_table;
 	
@@ -26,9 +26,7 @@ class m000000_000000_010_ysell_property_dev extends Migration
 	
 	public function safeUp( $params = [] )
 	{
-		parent::safeUp( [
-			'mode' => 1 ? static::ALTER_MODE_UPDATE : static::ALTER_MODE_IGNORE,
-		] );
+		parent::safeUp( $params );
 	}
 	
 	public function getColumns( $columns = [] )

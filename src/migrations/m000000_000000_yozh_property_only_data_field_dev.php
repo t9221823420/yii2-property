@@ -10,21 +10,17 @@
 use yozh\base\components\db\Migration;
 use yozh\base\components\db\Schema;
 use yozh\base\components\helpers\ArrayHelper;
+use yozh\form\ActiveField;
 
-class _m000000_000000_000_ysell_property_children_example_dev extends \yozh\property\migrations\namespaced\m000000_000000_010_ysell_property_dev
+class m000000_000000_yozh_property_only_data_field_dev extends \yozh\property\migrations\namespaced\m000000_000000_yozh_property_dev
 {
-	
-	public function __construct( array $config = [] )
-	{
-		static::$_table = \yozh\ysell\models\product\ProductTemplateField::getRawTableName();
-		
-		parent::__construct( $config );
-	}
 	
 	public function getColumns( $columns = [] )
 	{
 		return parent::getColumns( ArrayHelper::merge( [
-			'product_template_id' => $this->integer()->after( 'name' ),
+			
+			'data' => $this->json()->null(),
+		
 		], $columns ) );
 		
 	}
@@ -33,12 +29,14 @@ class _m000000_000000_000_ysell_property_children_example_dev extends \yozh\prop
 	{
 		return ArrayHelper::merge( [
 			
+			/*
 			[
-				'refTable'   => \yozh\ysell\models\product\ProductTemplate::getRawTableName(),
+				'refTable'   => Model::getRawTableName(),
 				'refColumns' => 'id',
-				'columns'    => 'product_template_id',
+				'columns'    => 'parent_id',
 				//'onDelete'   => self::CONSTRAINTS_ACTION_RESTRICT,
 			],
+			*/
 		
 		], $references );
 	}

@@ -2,7 +2,7 @@
 
 namespace yozh\property\migrations\namespaced;
 
-require_once dirname(__DIR__) . '/m000000_000000_010_ysell_property_dev.php';
+require_once dirname(__DIR__) . '/' . basename( __FILE__ );
 
 /**
  * Migration to support namespaced migrations.
@@ -13,6 +13,6 @@ require_once dirname(__DIR__) . '/m000000_000000_010_ysell_property_dev.php';
  *
  * @author moltam
  */
-class m000000_000000_010_ysell_property_dev extends \m000000_000000_010_ysell_property_dev
+class m000000_000000_yozh_property_dev extends \m000000_000000_yozh_property_dev
 {
 }

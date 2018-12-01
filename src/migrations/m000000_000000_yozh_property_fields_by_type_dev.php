@@ -12,7 +12,7 @@ use yozh\base\components\db\Schema;
 use yozh\base\components\helpers\ArrayHelper;
 use yozh\form\ActiveField;
 
-class m000000_000000_011_ysell_property_fields_by_type_dev extends \yozh\property\migrations\namespaced\m000000_000000_010_ysell_property_dev
+class m000000_000000_yozh_property_fields_by_type_dev extends \yozh\property\migrations\namespaced\m000000_000000_yozh_property_dev
 {
 	
 	public function getColumns( $columns = [] )
