@@ -11,7 +11,7 @@ use yozh\base\components\db\Migration;
 use yozh\base\components\db\Schema;
 use yozh\base\components\helpers\ArrayHelper;
 
-class _m000000_000000_yozh_property_children_example_dev extends \yozh\property\migrations\namespaced\m000000_000000_yozh_property_dev
+final class _m000000_000000_yozh_property_children_example_dev extends \yozh\property\migrations\namespaced\m000000_000000_yozh_property_dev
 {
 	
 	public function __construct( array $config = [] )
@@ -24,7 +24,7 @@ class _m000000_000000_yozh_property_children_example_dev extends \yozh\property\
 	public function getColumns( $columns = [] )
 	{
 		return parent::getColumns( ArrayHelper::merge( [
-			'product_template_id' => $this->integer()->after( 'name' ),
+			'property_template_id' => $this->integer()->after( 'name' ),
 		], $columns ) );
 		
 	}
@@ -36,7 +36,7 @@ class _m000000_000000_yozh_property_children_example_dev extends \yozh\property\
 			[
 				'refTable'   => \yozh\ysell\models\product\ProductTemplate::getRawTableName(),
 				'refColumns' => 'id',
-				'columns'    => 'product_template_id',
+				'columns'    => 'property_template_id',
 				//'onDelete'   => self::CONSTRAINTS_ACTION_RESTRICT,
 			],
 		

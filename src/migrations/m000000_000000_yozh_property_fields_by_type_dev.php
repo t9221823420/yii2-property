@@ -5,6 +5,9 @@
  * User: bw_dev
  * Date: 13.09.2018
  * Time: 9:25
+ *
+ * for scheme when each field uses standalone column depend of field type for economy of memory
+ * для кейсов когда каждое поле использует отдельную колонку в зависимости от типа для экономии памяти
  */
 
 use yozh\base\components\db\Migration;

@@ -12,7 +12,7 @@ use Yii;
 use yozh\property\models\Property;
 use yozh\form\traits\AttributeActionListTrait;
 
-class PropertyChildrenExample extends Property
+final class PropertyChildrenExample extends Property
 {
 	use AttributeActionListTrait {
 		AttributeActionListTrait::attributesDefaultList as attributesDefaultListTrait;
@@ -47,7 +47,7 @@ class PropertyChildrenExample extends Property
 		$except = array_unique( array_merge( $except, [
 			'config',
 			'validators',
-			//'data', // for CHILDREN_TYPE_ONLY_DATA_FIELD
+			//'data', // for SCHEME_TYPE_COMMON_DATA_FIELD
 		] ) );
 		
 		$attributes = self::attributesDefaultListTrait( $only, $except, $schemaOnly );

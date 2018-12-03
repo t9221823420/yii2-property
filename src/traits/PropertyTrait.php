@@ -13,13 +13,19 @@ use yii\base\Model;
 use yii\helpers\Html;
 use yozh\base\models\BaseActiveRecord as ActiveRecord;
 use yozh\form\ActiveField;
+use yozh\property\models\Property;
 use yozh\widget\widgets\BaseWidget as Widget;
 
 trait PropertyTrait
 {
 	protected $_value;
 	
-	protected $_fieldsType;
+	/**
+	 * @var
+	 * define type of Property realization
+	 *
+	 */
+	protected $_schemeType;
 	
 	public function __construct( array $config = [] )
 	{
@@ -28,18 +34,26 @@ trait PropertyTrait
 		
 		$attributes = parent::attributes();
 		
-		if( array_intersect( $attributes, ActiveField::getConstants( 'INPUT_TYPE' ) ) ) {
-			$this->_fieldsType = self::CHILDREN_TYPE_FIELDS_BY_TYPE;
+		if( !$this->_schemeType ) {
+			throw new \yii\base\InvalidParamException( "Property::schemeType have to be set" );
 		}
-		else if( array_intersect( $attributes, [ 'data' ] ) ) {
-			$this->_fieldsType = self::CHILDREN_TYPE_ONLY_DATA_FIELD;
+		else if( !in_array( $this->_schemeType, self::getConstants( 'SCHEME_TYPE' ) ) ) {
+			throw new \yii\base\InvalidParamException( "Invalid type of Property::schemeType" );
 		}
 		
-	}
-	
-	public static function tableName()
-	{
-		return '{{%yozh_property}}';
+		/**
+		 * if any of INPUT_TYPE exists in Model it's TYPE_FIELDS_BY_TYPE
+		 * else if Model has common 'data' field it's TYPE_COMMON_DATA_FIELD
+		 */
+		/*
+		if( array_intersect( $attributes, ActiveField::getConstants( 'INPUT_TYPE' ) ) ) {
+			$this->_schemeType = Property::SCHEME_TYPE_FIELDS_BY_TYPE;
+		}
+		else if( array_intersect( $attributes, [ 'data' ] ) ) {
+			$this->_schemeType = Property::SCHEME_TYPE_COMMON_DATA_FIELD;
+		}
+		*/
+		
 	}
 	
 	/*
@@ -64,17 +78,34 @@ trait PropertyTrait
 	{
 		return array_merge( parent::rules(), [
 			
-			'required' => [ [ 'name', 'type', 'widget' ], 'required', ],
+			'required'         => [ [ 'name', 'type', 'widget' ], 'required', ],
 			
-			'string'   => [ [ 'name', ], 'string', 'max' => 255 ],
-			'trim'     => [ [ 'name', 'value', ], 'filter', 'filter' => 'trim', 'skipOnEmpty' => true, ],
-			'purifier' => [ [ 'name', ], 'filter', 'filter' => '\yii\helpers\HtmlPurifier::process', 'skipOnEmpty' => true, ],
+			//integer
+			'integer'          => [ [ 'set', 'weight', ], 'integer' ],
+			'integer.positive' => [ [ 'set', ], 'compare', 'skipOnError' => true, 'operator' => '>', 'compareValue' => 0 ],
 			
-			[ [ 'name', ], 'match', 'pattern' => Html::$attributeRegex,
-			                        'message' => Yii::t( 'app', 'Attribute name must contain word characters only.' ), 'skipOnEmpty' => true ],
+			//string
+			'string.max'       => [ [ 'name', ], 'string', 'max' => 255 ],
+			'string.trim'      => [ [ 'name', 'value', ], 'filter', 'filter' => 'trim', 'skipOnEmpty' => true, ],
+			'string.purifier'  => [ [ 'name', ], 'filter', 'filter' => '\yii\helpers\HtmlPurifier::process', 'skipOnEmpty' => true, ],
 			
-			[ [ 'type' ], 'in', 'range' => ActiveField::getConstants( 'INPUT_TYPE' ) ],
-			[ [ 'widget' ], 'in', 'range' => ActiveField::getConstants( 'WIDGET_TYPE' ) ],
+			// name contain only word characters
+			'name.match' => [ [ 'name', ], 'match', 'pattern' => Html::$attributeRegex,
+			                                        'message' => Yii::t( 'app', 'Attribute name must contain word characters only.' ), 'skipOnEmpty' => true ],
+			
+			'type.in'     => [ [ 'type' ], 'in', 'range' => ActiveField::getConstants( 'INPUT_TYPE' ) ],
+			'widget.in'   => [ [ 'widget' ], 'in', 'range' => ActiveField::getConstants( 'WIDGET_TYPE' ) ],
+			
+			// fks
+			'fks.integer' => [ [ 'parent', ], 'integer' ],
+			'fks.compare' => [ [ 'parent', ], 'compare', 'skipOnError' => true, 'operator' => '>', 'compareValue' => 0 ],
+			
+			'fks.exist.parent' => [ [ 'parent' ],
+				'exist',
+				'skipOnError'     => true,
+				'targetClass'     => static::class,
+				'targetAttribute' => [ 'parent' => 'id' ],
+			],
 		
 		] );
 	}
@@ -90,9 +121,9 @@ trait PropertyTrait
 		// return used field type
 		if( $type = $this->getAttribute( 'type' ) ) {
 			
-			switch( $this->_fieldsType ) {
+			switch( $this->_schemeType ) {
 				
-				case self::CHILDREN_TYPE_FIELDS_BY_TYPE:
+				case self::SCHEME_TYPE_FIELDS_BY_TYPE:
 					
 					unset( $except[ $type ] );
 					
@@ -111,15 +142,15 @@ trait PropertyTrait
 	{
 		parent::afterFind();
 		
-		switch( $this->_fieldsType ) {
+		switch( $this->_schemeType ) {
 			
-			case self::CHILDREN_TYPE_FIELDS_BY_TYPE:
+			case self::SCHEME_TYPE_FIELDS_BY_TYPE:
 				
 				$this->_value = $this->getAttribute( $this->type );
 				
 				break;
 			
-			case self::CHILDREN_TYPE_ONLY_DATA_FIELD:
+			case self::SCHEME_TYPE_COMMON_DATA_FIELD:
 				
 				$this->_value = $this->getAttribute( 'data' );
 				
@@ -142,15 +173,15 @@ trait PropertyTrait
 		
 		if( $type = $this->getAttribute( 'type' ) ) {
 			
-			switch( $this->_fieldsType ) {
+			switch( $this->_schemeType ) {
 				
-				case self::CHILDREN_TYPE_FIELDS_BY_TYPE:
+				case self::SCHEME_TYPE_FIELDS_BY_TYPE:
 					
 					$this->setAttribute( $this->type, $this->_value );
 					
 					break;
 				
-				case self::CHILDREN_TYPE_ONLY_DATA_FIELD:
+				case self::SCHEME_TYPE_COMMON_DATA_FIELD:
 					
 					$this->setAttribute( 'data', $this->_value );
 					

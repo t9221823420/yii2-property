@@ -26,7 +26,7 @@ class m000000_000000_yozh_property_dev extends Migration
 	
 	public function safeUp( $params = [] )
 	{
-		parent::safeUp( $params );
+		return parent::safeUp( $params );
 	}
 	
 	public function getColumns( $columns = [] )
@@ -38,6 +38,9 @@ class m000000_000000_yozh_property_dev extends Migration
 			'widget'     => $this->enum( ActiveField::getConstants( 'WIDGET_TYPE' ) )->notNull()->defaultValue( ActiveField::DEFAULT_WIDGET_TYPE ),
 			'config'     => $this->json()->null(),
 			'validators' => $this->json()->null(),
+			'set'        => $this->integer()->null(),
+			'parent'     => $this->integer()->null(),
+			'weight'     => $this->integer()->defaultValue( 0 ),
 		
 		], $columns ) );
 	}
