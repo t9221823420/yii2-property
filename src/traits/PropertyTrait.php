@@ -9,8 +9,13 @@
 namespace yozh\property\traits;
 
 use Yii;
+use yii\base\ErrorHandler;
 use yii\base\Model;
 use yii\helpers\Html;
+use yozh\base\components\helpers\ArrayHelper;
+use yozh\base\components\helpers\Inflector;
+use yozh\base\components\validators\Validator;
+use yozh\base\interfaces\models\ActiveRecordInterface;
 use yozh\base\models\BaseActiveRecord as ActiveRecord;
 use yozh\form\ActiveField;
 use yozh\property\models\Property;
@@ -32,7 +37,7 @@ trait PropertyTrait
 		
 		parent::__construct( $config );
 		
-		$attributes = parent::attributes();
+		//$attributes = parent::attributes();
 		
 		if( !$this->_schemeType ) {
 			throw new \yii\base\InvalidParamException( "Property::schemeType have to be set" );
@@ -56,6 +61,23 @@ trait PropertyTrait
 		
 	}
 	
+	/**
+	 * PHP magic method that returns the string representation of this object.
+	 * @return string the string representation of this object.
+	 */
+	public function __toString()
+	{
+		// __toString cannot throw exception
+		// use trigger_error to bypass this limitation
+		try {
+			return $this->render();
+		} catch( \Exception $e ) {
+			ErrorHandler::convertExceptionToError( $e );
+			
+			return '';
+		}
+	}
+	
 	/*
 	static public function getInputsLabels()
 	{
@@ -74,40 +96,69 @@ trait PropertyTrait
 	}
 	*/
 	
-	public function rules()
+	public function rules( $rules = [], $update = false )
 	{
-		return array_merge( parent::rules(), [
-			
-			'required'         => [ [ 'name', 'type', 'widget' ], 'required', ],
-			
-			//integer
-			'integer'          => [ [ 'set', 'weight', ], 'integer' ],
-			'integer.positive' => [ [ 'set', ], 'compare', 'skipOnError' => true, 'operator' => '>', 'compareValue' => 0 ],
-			
-			//string
-			'string.max'       => [ [ 'name', ], 'string', 'max' => 255 ],
-			'string.trim'      => [ [ 'name', 'value', ], 'filter', 'filter' => 'trim', 'skipOnEmpty' => true, ],
-			'string.purifier'  => [ [ 'name', ], 'filter', 'filter' => '\yii\helpers\HtmlPurifier::process', 'skipOnEmpty' => true, ],
-			
-			// name contain only word characters
-			'name.match' => [ [ 'name', ], 'match', 'pattern' => Html::$attributeRegex,
-			                                        'message' => Yii::t( 'app', 'Attribute name must contain word characters only.' ), 'skipOnEmpty' => true ],
-			
-			'type.in'     => [ [ 'type' ], 'in', 'range' => ActiveField::getConstants( 'INPUT_TYPE' ) ],
-			'widget.in'   => [ [ 'widget' ], 'in', 'range' => ActiveField::getConstants( 'WIDGET_TYPE' ) ],
-			
-			// fks
-			'fks.integer' => [ [ 'parent', ], 'integer' ],
-			'fks.compare' => [ [ 'parent', ], 'compare', 'skipOnError' => true, 'operator' => '>', 'compareValue' => 0 ],
-			
-			'fks.exist.parent' => [ [ 'parent' ],
-				'exist',
-				'skipOnError'     => true,
-				'targetClass'     => static::class,
-				'targetAttribute' => [ 'parent' => 'id' ],
-			],
+		static $_rules;
 		
-		] );
+		if( !$_rules || $update ) {
+			
+			$_rules = [
+				
+				'required'         => [ [ 'name', 'type', 'widget' ], 'required', ],
+				
+				//integer
+				'integer'          => [ [ 'set', 'weight', ], 'integer' ],
+				'compare.positive' => [ [ 'set', ], 'compare', 'skipOnError' => true, 'operator' => '>', 'compareValue' => 0 ],
+				
+				//string
+				'string'           => [ [ 'name', 'label', ], 'string', 'max' => 255 ],
+				'filter.trim'      => [ [ 'name', 'label', 'value', ], 'filter', 'filter' => 'trim', 'skipOnEmpty' => true, ],
+				'filter.purifier'  => [ [ 'name', 'label', ], 'filter', 'filter' => '\yii\helpers\HtmlPurifier::process', 'skipOnEmpty' => true, ],
+				
+				// name contain only word characters
+				'match.name'       => [ [ 'name', ], 'match', 'pattern' => Html::$attributeRegex,
+				                                              'message' => Yii::t( 'app', 'Attribute name must contain word characters only.' ), 'skipOnEmpty' => true ],
+				
+				'in.type'   => [ [ 'type' ], 'in', 'range' => ActiveField::getConstants( 'INPUT_TYPE' ) ],
+				'in.widget' => [ [ 'widget' ], 'in', 'range' => ActiveField::getConstants( 'WIDGET_TYPE' ) ],
+				
+				'json'        => [ [ 'validators', 'config', ], function( $attribute ) {
+					
+					if( is_string($this->$attribute) ){
+						
+						$result = \yii\helpers\Json::decode( $this->$attribute );
+						
+						if( json_last_error() ) {
+							$this->addError( $attribute, \Yii::t( 'app', "Invalid or malformed data for JSON" ) );
+						}
+						else{
+							$this->$attribute = $result;
+						}
+					}
+					
+				} ],
+				
+				// fks
+				'integer.fks' => [ [ 'parent', ], 'integer' ],
+				'compare.fks' => [ [ 'parent', ], 'compare', 'skipOnError' => true, 'operator' => '>', 'compareValue' => 0 ],
+				
+				'exist.fks.parent' => [ [ 'parent' ],
+					'exist',
+					'skipOnError'     => true,
+					'targetClass'     => static::class,
+					'targetAttribute' => [ 'parent' => 'id' ],
+				],
+			
+			];
+			
+			if( $this instanceof ActiveRecordInterface ) {
+				$_rules = parent::rules( Validator::merge( $_rules, $rules ) );
+			}
+			
+		}
+		
+		return $_rules;
+		
 	}
 	
 	public function attributes( ?array $only = null, ?array $except = null, ?bool $schemaOnly = false )
@@ -160,11 +211,18 @@ trait PropertyTrait
 		
 	}
 	
+	public function beforeSave( $insert )
+	{
+		$this->label = !empty( $this->label ) ? $this->label : Inflector::titleize( $this->name );
+		
+		return parent::beforeSave( $insert ); // TODO: Change the autogenerated stub
+	}
+	
 	public function afterSave( $insert, $changedAttributes )
 	{
-		parent::afterSave( $insert, $changedAttributes );
+		return parent::afterSave( $insert, $changedAttributes );
 		
-		$this->setValue( $this->_value );
+		//$this->setValue( $this->_value );
 	}
 	
 	public function setValue( $value )

@@ -34,6 +34,7 @@ class m000000_000000_yozh_property_dev extends Migration
 		return parent::getColumns( ArrayHelper::merge( [
 			
 			'name'       => $this->string()->notNull(),
+			'label'      => $this->string()->null()->after( 'name' ),
 			'type'       => $this->enum( ActiveField::getConstants( 'INPUT_TYPE' ) )->notNull()->defaultValue( ActiveField::DEFAULT_INPUT_TYPE ),
 			'widget'     => $this->enum( ActiveField::getConstants( 'WIDGET_TYPE' ) )->notNull()->defaultValue( ActiveField::DEFAULT_WIDGET_TYPE ),
 			'config'     => $this->json()->null(),

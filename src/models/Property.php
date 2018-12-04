@@ -17,4 +17,6 @@ abstract class Property extends ActiveRecord
 	{
 		throw new \yii\base\InvalidParamException( "Table name is not set" );
 	}
+	
+	
 }

@@ -23,11 +23,20 @@ final class PropertyChildrenExample extends Property
 		return '{{%yozh_property_children_example}}';
 	}
 	
-	public function rules()
+	public function rules( $rules = [], $update = false )
 	{
-		return array_merge( parent::rules(), [
+		static $_rules;
 		
-		] );
+		if( !$_rules || $update ) {
+			
+			$_rules = parent::rules( \yozh\base\components\validators\Validator::merge( [
+			
+			], $rules ) );
+			
+		}
+		
+		return $_rules;
+		
 	}
 	
 	public function attributesEditList( ?array $only = null, ?array $except = null, ?bool $schemaOnly = false )
