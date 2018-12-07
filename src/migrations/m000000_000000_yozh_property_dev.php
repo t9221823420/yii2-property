@@ -31,14 +31,19 @@ class m000000_000000_yozh_property_dev extends Migration
 	
 	public function getColumns( $columns = [] )
 	{
-		return parent::getColumns( ArrayHelper::merge( [
+		return parent::getColumns( array_merge( [
 			
 			'name'       => $this->string()->notNull(),
 			'label'      => $this->string()->null()->after( 'name' ),
-			'type'       => $this->enum( ActiveField::getConstants( 'INPUT_TYPE' ) )->notNull()->defaultValue( ActiveField::DEFAULT_INPUT_TYPE ),
-			'widget'     => $this->enum( ActiveField::getConstants( 'WIDGET_TYPE' ) )->notNull()->defaultValue( ActiveField::DEFAULT_WIDGET_TYPE ),
+			
+			'type'       => $this->enum( ActiveField::getConstants( 'INPUT_TYPE' ) )
+			                     ->notNull()->defaultValue( ActiveField::DEFAULT_INPUT_TYPE ),
+			'widget'     => $this->enum( ActiveField::getConstants( 'WIDGET_TYPE' ) )
+			                     ->notNull()->defaultValue( ActiveField::DEFAULT_WIDGET_TYPE ),
+			
 			'config'     => $this->json()->null(),
 			'validators' => $this->json()->null(),
+			
 			'set'        => $this->integer()->null(),
 			'parent'     => $this->integer()->null(),
 			'weight'     => $this->integer()->defaultValue( 0 ),

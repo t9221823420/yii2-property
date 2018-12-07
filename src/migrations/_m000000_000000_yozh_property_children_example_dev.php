@@ -23,7 +23,7 @@ final class _m000000_000000_yozh_property_children_example_dev extends \yozh\pro
 	
 	public function getColumns( $columns = [] )
 	{
-		return parent::getColumns( ArrayHelper::merge( [
+		return parent::getColumns( array_merge( [
 			'property_template_id' => $this->integer()->after( 'name' ),
 		], $columns ) );
 		

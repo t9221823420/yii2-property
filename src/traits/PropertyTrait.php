@@ -34,7 +34,6 @@ trait PropertyTrait
 	
 	public function __construct( array $config = [] )
 	{
-		
 		parent::__construct( $config );
 		
 		//$attributes = parent::attributes();
@@ -124,14 +123,14 @@ trait PropertyTrait
 				
 				'json'        => [ [ 'validators', 'config', ], function( $attribute ) {
 					
-					if( is_string($this->$attribute) ){
+					if( is_string( $this->$attribute ) ) {
 						
 						$result = \yii\helpers\Json::decode( $this->$attribute );
 						
 						if( json_last_error() ) {
 							$this->addError( $attribute, \Yii::t( 'app', "Invalid or malformed data for JSON" ) );
 						}
-						else{
+						else {
 							$this->$attribute = $result;
 						}
 					}
@@ -152,7 +151,7 @@ trait PropertyTrait
 			];
 			
 			if( $this instanceof ActiveRecordInterface ) {
-				$_rules = parent::rules( Validator::merge( $_rules, $rules ) );
+				$_rules = parent::rules( \yozh\base\components\validators\Validator::merge( $_rules, $rules ) );
 			}
 			
 		}

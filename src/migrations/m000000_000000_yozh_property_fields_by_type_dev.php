@@ -20,7 +20,7 @@ class m000000_000000_yozh_property_fields_by_type_dev extends \yozh\property\mig
 	
 	public function getColumns( $columns = [] )
 	{
-		return parent::getColumns( ArrayHelper::merge( [
+		return parent::getColumns( array_merge( [
 			
 			ActiveField::INPUT_TYPE_STRING => $this->string()->null(),
 			ActiveField::INPUT_TYPE_TEXT   => $this->text()->null(),
