@@ -53,7 +53,7 @@ class m000000_000000_yozh_property_dev extends Migration
 	
 	public function getReferences( $references = [] )
 	{
-		return ArrayHelper::merge( [
+		return parent::getReferences( array_merge( [
 			
 			/*
 			[
@@ -64,7 +64,7 @@ class m000000_000000_yozh_property_dev extends Migration
 			],
 			*/
 		
-		], $references );
+		], $references ) );
 	}
 	
 }

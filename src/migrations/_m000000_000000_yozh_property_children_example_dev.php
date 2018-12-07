@@ -31,7 +31,7 @@ final class _m000000_000000_yozh_property_children_example_dev extends \yozh\pro
 	
 	public function getReferences( $references = [] )
 	{
-		return ArrayHelper::merge( [
+		return parent::getReferences( array_merge( [
 			
 			[
 				'refTable'   => \yozh\ysell\models\product\ProductTemplate::getRawTableName(),
@@ -40,7 +40,7 @@ final class _m000000_000000_yozh_property_children_example_dev extends \yozh\pro
 				//'onDelete'   => self::CONSTRAINTS_ACTION_RESTRICT,
 			],
 		
-		], $references );
+		], $references ) );
 	}
 	
 }

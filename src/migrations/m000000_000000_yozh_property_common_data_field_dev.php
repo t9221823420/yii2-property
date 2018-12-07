@@ -29,7 +29,7 @@ class m000000_000000_yozh_property_common_data_field_dev extends \yozh\property\
 	
 	public function getReferences( $references = [] )
 	{
-		return ArrayHelper::merge( [
+		return parent::getReferences( array_merge( [
 			
 			/*
 			[
@@ -40,7 +40,7 @@ class m000000_000000_yozh_property_common_data_field_dev extends \yozh\property\
 			],
 			*/
 		
-		], $references );
+		], $references ) );
 	}
 	
 }
